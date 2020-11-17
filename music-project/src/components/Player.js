@@ -1,10 +1,12 @@
 import React,{ useEffect} from 'react'
-import {playAudio} from '../util'
+
 import * as fa from 'react-icons/fa';
 
 
 
-const Player = ({songInfo ,setSongInfo,timeUpdateHandler,audioRef,currentSong, isPlaying, setIsPlaying, songs,setSongs, setCurrentSong }) => {
+const Player = ({songInfo ,setSongInfo,timeUpdateHandler,audioRef,
+                 currentSong, isPlaying, setIsPlaying, songs,setSongs,
+                  setCurrentSong, songEndedHandler }) => {
 
         
     //Event Handlers
@@ -30,22 +32,22 @@ const Player = ({songInfo ,setSongInfo,timeUpdateHandler,audioRef,currentSong, i
             setSongInfo({...songInfo, currentTime: e.target.value})
         }
 
-        const skipTrackHandler = (direction) => {
+        const skipTrackHandler =  async(direction) => {
 
             let currentIndex = songs.findIndex((song) => song.id === currentSong.id )
             if(direction === 'skip-forward'){
-                setCurrentSong(songs[(currentIndex+1) % songs.length])
+               await setCurrentSong(songs[(currentIndex+1) % songs.length])
             }
             if(direction === 'skip-back'){
                 if((currentIndex -1 ) % songs.length === -1){
-                    setCurrentSong(songs[songs.length - 1])
-                    playAudio(isPlaying, audioRef)
+                  await setCurrentSong(songs[songs.length - 1])
+                    if(isPlaying) audioRef.current.play()
                     return;
 
                 }
-                setCurrentSong(songs[(currentIndex-1) % songs.length])
+               await setCurrentSong(songs[(currentIndex-1) % songs.length])
             }
-            playAudio(isPlaying, audioRef)
+            if(isPlaying) audioRef.current.play()
 
         }
 
@@ -120,11 +122,7 @@ const Player = ({songInfo ,setSongInfo,timeUpdateHandler,audioRef,currentSong, i
                  />
 
             </div>
-            <audio 
-            onLoadedMetadata={timeUpdateHandler} 
-            onTimeUpdate={timeUpdateHandler} 
-            ref={audioRef} 
-            src={currentSong.audio}></audio>
+           
         </div>
     )
 }
