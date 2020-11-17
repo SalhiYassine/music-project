@@ -4,9 +4,9 @@ import * as fa from 'react-icons/fa';
 
 
 
-const Player = ({songInfo ,setSongInfo,timeUpdateHandler,audioRef,
+const Player = ({songInfo ,setSongInfo,audioRef,
                  currentSong, isPlaying, setIsPlaying, songs,setSongs,
-                  setCurrentSong, songEndedHandler }) => {
+                  setCurrentSong, libraryHandler }) => {
 
         
     //Event Handlers
@@ -37,40 +37,24 @@ const Player = ({songInfo ,setSongInfo,timeUpdateHandler,audioRef,
             let currentIndex = songs.findIndex((song) => song.id === currentSong.id )
             if(direction === 'skip-forward'){
                await setCurrentSong(songs[(currentIndex+1) % songs.length])
+               libraryHandler(songs[(currentIndex+1) % songs.length])
             }
             if(direction === 'skip-back'){
                 if((currentIndex -1 ) % songs.length === -1){
                   await setCurrentSong(songs[songs.length - 1])
+                  libraryHandler(songs[songs.length - 1])
                     if(isPlaying) audioRef.current.play()
                     return;
 
                 }
                await setCurrentSong(songs[(currentIndex-1) % songs.length])
+               libraryHandler(songs[(currentIndex-1) % songs.length])
             }
             if(isPlaying) audioRef.current.play()
 
         }
 
-        //useEffect
-        useEffect(() => {
-
-            const newSongs = songs.map((song) => {
-                if(song.id === currentSong.id){
-                    return{
-                        ...song,
-                        active: true,
-                    }
-    
-                }else{
-                    return{
-                        ...song,
-                        active:false,
-                    }
-                }
-            })
-            setSongs(newSongs);
-
-        },[currentSong])
+      
         
 
 
@@ -119,6 +103,7 @@ const Player = ({songInfo ,setSongInfo,timeUpdateHandler,audioRef,
                  <fa.FaAngleRight 
                  className="skip-forward"
                  onClick={()=> skipTrackHandler("skip-forward")}
+
                  />
 
             </div>
